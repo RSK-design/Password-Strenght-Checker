@@ -1,119 +1,97 @@
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:'Segoe UI',sans-serif;
-}
+const password = document.getElementById("password");
+const fill = document.getElementById("strength-fill");
+const strengthText = document.getElementById("strength-text");
+const scoreText = document.getElementById("score");
+const toggleBtn = document.getElementById("toggleBtn");
+const tips = document.getElementById("tips");
 
-body{
-    min-height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
+const commonPasswords = [
+    "password",
+    "123456",
+    "qwerty",
+    "admin",
+    "welcome"
+];
 
-    background:linear-gradient(
-        135deg,
-        #667eea,
-        #764ba2,
-        #6b73ff
-    );
+toggleBtn.addEventListener("click", () => {
+    password.type =
+        password.type === "password"
+        ? "text"
+        : "password";
+});
 
-    background-size:300% 300%;
-    animation:bgMove 8s infinite alternate;
-}
+password.addEventListener("input", checkPassword);
 
-@keyframes bgMove{
-    from{
-        background-position:left;
+function checkPassword(){
+
+    const pwd = password.value;
+
+    let score = 0;
+
+    const checks = {
+        length: pwd.length >= 8,
+        upper: /[A-Z]/.test(pwd),
+        lower: /[a-z]/.test(pwd),
+        number: /\d/.test(pwd),
+        special: /[^A-Za-z0-9]/.test(pwd)
+    };
+
+    Object.keys(checks).forEach(id => {
+
+        const element = document.getElementById(id);
+
+        if(checks[id]){
+            element.classList.add("valid");
+            element.innerHTML =
+            element.innerHTML.replace("❌","✅");
+
+            score++;
+        }
+        else{
+            element.classList.remove("valid");
+            element.innerHTML =
+            element.innerHTML.replace("✅","❌");
+        }
+    });
+
+    let percentage = score * 20;
+
+    fill.style.width = percentage + "%";
+
+    if(score <= 2){
+        fill.style.background =
+        "linear-gradient(to right,#ff4d4d,#ff0000)";
+        strengthText.textContent =
+        "Strength: Weak";
     }
-    to{
-        background-position:right;
+    else if(score === 3 || score === 4){
+        fill.style.background =
+        "linear-gradient(to right,#ffcc00,#ff9900)";
+        strengthText.textContent =
+        "Strength: Moderate";
     }
-}
+    else{
+        fill.style.background =
+        "linear-gradient(to right,#00ff95,#00cc66)";
+        strengthText.textContent =
+        "Strength: Strong";
+    }
 
-.container{
-    width:450px;
-    padding:30px;
+    scoreText.textContent =
+    `Score: ${percentage}%`;
 
-    backdrop-filter:blur(15px);
-    background:rgba(255,255,255,0.15);
-
-    border:1px solid rgba(255,255,255,0.2);
-    border-radius:20px;
-
-    color:white;
-
-    box-shadow:
-    0 8px 32px rgba(0,0,0,0.3);
-}
-
-h1{
-    text-align:center;
-    margin-bottom:25px;
-}
-
-.input-box{
-    position:relative;
-}
-
-input{
-    width:100%;
-    padding:15px;
-    border:none;
-    border-radius:12px;
-    outline:none;
-    font-size:16px;
-}
-
-#toggleBtn{
-    position:absolute;
-    right:10px;
-    top:50%;
-    transform:translateY(-50%);
-    border:none;
-    background:none;
-    cursor:pointer;
-    font-size:18px;
-}
-
-.strength-container{
-    width:100%;
-    height:15px;
-    background:rgba(255,255,255,0.2);
-    border-radius:20px;
-    margin-top:20px;
-    overflow:hidden;
-}
-
-#strength-fill{
-    height:100%;
-    width:0%;
-    border-radius:20px;
-    transition:0.4s;
-}
-
-#strength-text,
-#score{
-    margin-top:12px;
-    font-weight:bold;
-}
-
-.requirements{
-    margin-top:20px;
-    list-style:none;
-}
-
-.requirements li{
-    margin:8px 0;
-}
-
-.valid{
-    color:#00ff95;
-}
-
-#tips{
-    margin-top:20px;
-    padding:12px;
-    border-radius:10px;
-    background:rgba(255,255,255,0.1);
+    if(commonPasswords.includes(
+        pwd.toLowerCase()
+    )){
+        tips.innerHTML =
+        "⚠ This is a commonly used password and can be cracked easily.";
+    }
+    else if(score < 5){
+        tips.innerHTML =
+        "💡 Try adding uppercase letters, numbers, and symbols.";
+    }
+    else{
+        tips.innerHTML =
+        "🎉 Excellent password! Very difficult to guess.";
+    }
 }
